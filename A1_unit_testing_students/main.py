@@ -3,4 +3,5 @@ from products import *
 
 
 #Run program
-searchAndBuyProduct()
+#searchAndBuyProduct()
+login()
