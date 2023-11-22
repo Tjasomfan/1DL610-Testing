@@ -1,5 +1,6 @@
 import csv
 from logout import logout
+import json
 
 #User class to represent user information
 class User:
@@ -118,6 +119,23 @@ def checkoutAndPayment(login_info):
             # Logout the user
             ask_logout = logout(cart)
             if ask_logout is True:
+
+                # Below is added code for updating wallet information in the user file
+
+                # Read the JSON file
+                with open('uses.json', 'r') as file:
+                    data = json.load(file)
+
+                # Update the wallet of the user
+                for user in data:
+                    if user["username"] == user.name:
+                        user["wallet"] = user.wallet
+                        break
+
+                # Write the updated data back to the file
+                with open('uses.json', 'w') as file:
+                    json.dump(data, file, indent=2)
+
                 print("You have been logged out")
                 break
             else:
