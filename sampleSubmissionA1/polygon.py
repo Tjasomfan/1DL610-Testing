@@ -8,10 +8,12 @@ def polygon(nodes):
         elif len(nodes) == 4:
             result = quadrilateral(nodes[0], nodes[1], nodes[2], nodes[3])
         else:
+            print("This is a large polygon")
             result = "Large Polygon"
         return result
     else:
         return "Input is not a list"
+
 def triang(n1,n2,n3):
     if n1==n2==n3:
         return "Equilateral"

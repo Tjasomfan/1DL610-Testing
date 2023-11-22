@@ -10,6 +10,20 @@ def triangle_stub1(mocker):
 def quadrilateral_stub1(mocker):
     return mocker.patch('polygon.quadrilateral', return_value="IrrQuad")
 
+@pytest.fixture
+def output_fixture(capsys):
+    polygon([1,2,2,4,5,3,5,4])
+    out, err = capsys.readouterr()
+    return out.strip()
+
+def test_open_file():
+    try:
+        with open("sampleSubmissionA1/README.md", 'r') as file:
+            content = file.read()
+        assert True is True
+    except Exception as e:
+        assert True is False
+
 def test_int_input():
     assert polygon(1)== "Input is not a list"
 
@@ -39,3 +53,6 @@ def test_EC3_with_quadrilateral_stub(quadrilateral_stub1, mocker):
 
 def test_EC4():
     assert polygon([1, 2, 3, 4, 5])== "Large Polygon"
+
+def test_EC4_with_output(output_fixture, capsys):
+    assert output_fixture == "This is a large polygon"
