@@ -30,18 +30,21 @@ def test_products():
     testproducts = load_products_from_csv("products.csv")
     return testproducts
 
+#Function to filter a product by name from the products list
+def get_product_by_name(products, target_name):
+    for product in products:
+        if product.name == target_name:
+            return product
+    return None  # Return None if the product with the specified name is not found
 
 
 #Test case for checking out an empty cart
-def test_checkout_empty_cart(test_user, test_products, capfd):
+def test_checkout_empty_cart(test_user, test_cart, test_products, capfd):
     # Updates users balance
     test_user.wallet = 10.0
 
-    #Creates empty cart
-    cart = ShoppingCart()
-
     #Checkout the cart
-    checkout(test_user, cart, test_products)
+    checkout(test_user, test_cart, test_products)
 
     # Captured the print
     captured = capfd.readouterr()
@@ -56,15 +59,12 @@ def test_checkout_empty_cart(test_user, test_products, capfd):
     assert test_user.wallet == 10.0
 
     # Ensure that the shopping cart remains empty
-    assert not cart.items
+    assert not test_cart.items
 
 #Test case for checking out an empty cart and empty wallet
-def test_checkout_empty_cart_and_wallet(test_user, test_products, capfd):
-    #Creates empty cart
-    cart = ShoppingCart()
-
+def test_checkout_empty_cart_and_wallet(test_user, test_cart, test_products, capfd):
     #Checkout the cart
-    checkout(test_user, cart, test_products)
+    checkout(test_user, test_cart, test_products)
 
     # Captured the print
     captured = capfd.readouterr()
@@ -79,15 +79,7 @@ def test_checkout_empty_cart_and_wallet(test_user, test_products, capfd):
     assert test_user.wallet == 0.0
 
     # Ensure that the shopping cart remains empty
-    assert not cart.items
-
-#Function to filter a product by name from the products list
-def get_product_by_name(products, target_name):
-    for product in products:
-        if product.name == target_name:
-            return product
-    return None  # Return None if the product with the specified name is not found
-
+    assert not test_cart.items
 
 #Test case for checking out a cart with user having a balance of zero
 def test_zero_wallet_balance(test_user, test_cart, test_products, capfd):
@@ -282,9 +274,7 @@ def test_remove_item_from_products(test_user, test_cart, test_products, capfd):
     #Checkout the cart
     checkout(test_user, test_cart, test_products)
     
-    # Captured the print
-    captured = capfd.readouterr()
-    
+   
     #assert that there has been one banana subtracted from stock
     assert salmon.units == 0
     
