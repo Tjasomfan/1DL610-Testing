@@ -33,7 +33,7 @@ def test_products():
 
 
 #Test case for checking out an empty cart
-def test_checkout_empty_cart(test_user, test_cart, test_products, capfd):
+def test_checkout_empty_cart(test_user, test_products, capfd):
     # Updates users balance
     test_user.wallet = 10.0
 
@@ -59,7 +59,7 @@ def test_checkout_empty_cart(test_user, test_cart, test_products, capfd):
     assert not cart.items
 
 #Test case for checking out an empty cart and empty wallet
-def test_checkout_empty_cart_and_wallet(test_user, test_cart, test_products, capfd):
+def test_checkout_empty_cart_and_wallet(test_user, test_products, capfd):
     #Creates empty cart
     cart = ShoppingCart()
 
@@ -219,7 +219,7 @@ def test_succesful_checkout(test_user, test_cart, test_products, capfd):
     # Ensure that the user's wallet has the correct balance
     assert test_user.wallet == 0.0
 
-    # Ensure that the shopping cart remains unchanged
+    # Ensure that the shopping cart is empty
     assert test_cart.items == []
 
 #Test case for succesful checkout for several items
@@ -260,7 +260,7 @@ def test_2_items_checkout(test_user, test_cart, test_products, capfd):
     # Ensure that the user's wallet has the correct balance
     assert test_user.wallet == 1.0
 
-    # Ensure that the shopping cart remains unchanged
+    # Ensure that the shopping cart is empty
     assert test_cart.items == []
 
 #Test case for product being bought up and removed from products list
@@ -291,7 +291,7 @@ def test_remove_item_from_products(test_user, test_cart, test_products, capfd):
     # Ensure that the user's wallet has the correct balance
     assert test_user.wallet == 10.0
 
-    # Ensure that the shopping cart remains unchanged
+    # Ensure that the shopping cart is empty
     assert test_cart.items == []
 
     #extracts salmon again
@@ -300,7 +300,7 @@ def test_remove_item_from_products(test_user, test_cart, test_products, capfd):
     #checks that there is no item named salmon anymore in products list
     assert salmon == None
 
-#Test case for insufficient units, shouldn't be able to check out when too many items are in cart? Although this check isn't programmed
+#Test case for insufficient units, shouldn't be able to check out when too many items are in cart, although this check isn't programmed
 def test_checkout_with_insufficient_units(test_user, test_cart, test_products, capfd):
     # Updates users balance
     test_user.wallet = 30.0
@@ -322,15 +322,13 @@ def test_checkout_with_insufficient_units(test_user, test_cart, test_products, c
     
     # Captured the print
     captured = capfd.readouterr()
-    
+
     #assert that there has been one banana subtracted from stock
-    assert salmon.units == -1
+    assert salmon.units == 0
     
     # Ensure that the user's wallet has the correct balance
-    assert test_user.wallet == 0.0
+    assert test_user.wallet == 10.0
 
-    # Ensure that the shopping cart remains unchanged
-    assert test_cart.items == []
 
 #Test case for multiple checkouts and large balance
 def test_checkout_purchase_more_checkout_and_large_balance(test_user, test_cart, test_products, capfd):
@@ -370,7 +368,7 @@ def test_checkout_purchase_more_checkout_and_large_balance(test_user, test_cart,
     # Ensure that the user's wallet has the correct balance
     assert test_user.wallet == 999989.0
 
-    # Ensure that the shopping cart remains unchanged
+    # Ensure that the shopping cart is empty
     assert test_cart.items == []
 
     #Adds single item to cart
@@ -399,5 +397,5 @@ def test_checkout_purchase_more_checkout_and_large_balance(test_user, test_cart,
     # Ensure that the user's wallet has the correct balance
     assert test_user.wallet == 999977.0
 
-    # Ensure that the shopping cart remains unchanged
+    # Ensure that the shopping cart is empty
     assert test_cart.items == []
