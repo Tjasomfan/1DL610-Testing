@@ -54,11 +54,11 @@ def load_products_from_csv(file_path):
     return products
 
 # Load products from the CSV file
-products= load_products_from_csv("products.csv")
+# products= load_products_from_csv("products.csv")
 cart = ShoppingCart()
 
 # Function to complete the checkout process
-def checkout(user, cart):
+def checkout(user, cart, products):
     if not cart.items:
         print("\nYour basket is empty. Please add items before checking out.")
         return
