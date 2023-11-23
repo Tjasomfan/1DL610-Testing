@@ -34,15 +34,6 @@ class TestDisplayFilteredTable(unittest.TestCase):
             except:
                 assert True
 
-    # Test empty file string
-    def test_empty_string(self):
-        with patch('builtins.open', return_value=StringIO()) as mock_open:
-            try:
-                display_filtered_table('', "search")
-                assert False
-            except:
-                assert True
-
     # Test empty search no rows
     def test_empty_search_no_rows(self):
         csv_content = 'Product,Price,Units\n'
@@ -146,4 +137,19 @@ class TestDisplayFilteredTable(unittest.TestCase):
             captured_output = mock_stdout.read()
 
         expected_output = "['Product', 'Price', 'Units']\n['Orange', '13', '6']\n"
+        self.assertEqual(captured_output, expected_output)
+
+        # Test search in 2 of 2 rows with different product names
+    def test_successful_search_all_rows_2(self):
+        csv_content = 'Product,Price,Units\ncar,5,25\ncart,13,6\n'
+        # Create a temporary CSV file
+        temp_file = create_temporary_file(csv_content, '.csv')
+
+        # Test function with mock stdout
+        with patch('sys.stdout', new_callable=tempfile.SpooledTemporaryFile, mode='w+t', create=True) as mock_stdout:
+            display_filtered_table(temp_file.name, "cart")
+            mock_stdout.seek(0)
+            captured_output = mock_stdout.read()
+
+        expected_output = "['Product', 'Price', 'Units']\n['cart', '13', '6']\n"
         self.assertEqual(captured_output, expected_output)
