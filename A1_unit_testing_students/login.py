@@ -40,4 +40,3 @@ def valid_password(password):
     has_upper = any(char.isupper() for char in password)
     has_special = any(not char.isalnum() for char in password)
     return has_upper and has_special
-    
