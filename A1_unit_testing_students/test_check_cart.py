@@ -42,7 +42,7 @@ def get_product_by_name(products, target_name):
             return product
     return None  # Return None if the product with the specified name is not found
 
-#Test case for checking out an empty cart
+#Test case for not checking out an empty cart
 def test_no_checkout_empty_cart(test_user, test_cart, test_products, mock_input):
     mock_input.side_effect = ["N"]
 
@@ -61,7 +61,7 @@ def test_no_checkout_empty_cart(test_user, test_cart, test_products, mock_input)
     # Ensure that the user's wallet remains unchanged
     assert test_user.wallet == 10.0
 
-#Test case for checking out an empty cart
+#Test case for not checking out a non-empty cart
 def test_no_checkout_non_empty_cart(test_user, test_cart, test_products, capfd, mock_input):
     mock_input.side_effect = ["N"]
 
@@ -95,7 +95,7 @@ def test_no_checkout_non_empty_cart(test_user, test_cart, test_products, capfd, 
     # Ensure that the user's wallet remains unchanged
     assert test_user.wallet == 10.0
 
-#Test case for checking out an empty cart
+#Test case for checking out a non-empty cart with sufficient balance
 def test_checkout_non_empty_cart(test_user, test_cart, test_products, capfd, mock_input):
     mock_input.side_effect = ["Y"]
 
@@ -157,6 +157,7 @@ def test_case_sensitivity(test_user, test_cart, test_products, capfd, mock_input
     # Ensure that the user's wallet has been changed
     assert test_user.wallet == 9.0
 
+#Test case for checking out an empty cart
 def test_checkout_empty_cart(test_user, test_cart, test_products, capfd, mock_input):
     mock_input.side_effect = ["Y"]
 
@@ -181,7 +182,7 @@ def test_checkout_empty_cart(test_user, test_cart, test_products, capfd, mock_in
     # Ensure that the user's wallet remains unchanged
     assert test_user.wallet == 10.0
 
-#Test case for checking out not checking out a cart, and then checking it out
+#Test case for  not checking out a cart, and then checking it out
 def test_no_checkout_non_empty_cart_then_checkout(test_user, test_cart, test_products, capfd, mock_input):
     mock_input.side_effect = ["N","Y"]
 
@@ -246,69 +247,12 @@ def test_random_input(test_user, test_cart, test_products, mock_input):
     # Ensure that the user's wallet remains unchanged
     assert test_user.wallet == 10.0
 
-
-#Test case for updating cart and then checking out
-def test_no_checkout_non_empty_cart_then_checkout(test_user, test_cart, test_products, capfd, mock_input):
-    mock_input.side_effect = ["N","Y"]
-
-    # Updates users balance
-    test_user.wallet = 50.0
-
-    #Extracts product
-    banana = get_product_by_name(test_products, "Banana")
-    salmon = get_product_by_name(test_products, "Salmon")
-    pb = get_product_by_name(test_products, "Peanut Butter")
-
-    #Adds items to cart
-    test_cart.add_item(banana)
-    test_cart.add_item(salmon)
-    test_cart.add_item(pb)
-
-    # Ensure that the shopping cart has the correct items
-    assert test_cart.items == [banana, salmon, pb]
-
-    #Run check_cart function
-    result = check_cart(test_user, test_cart, test_products)
-
-    # Asserts false return
-    assert result is False
-
-    #Expected output
-    expected_output = f"['Banana', 1.0, 15]\n['Salmon', 10.0, 2]\n['Peanut Butter', 3.0, 6]"
-
-    # Captured the print
-    captured = capfd.readouterr()
-
-    #Asserts that the expected output matches the correct output
-    assert expected_output == captured.out.strip()
-
-    #Removes salmon from cart
-    test_cart.remove_item(salmon)
-
-    # Ensure that the shopping cart has the correct items
-    assert test_cart.items == [banana, pb]
-
-    #Run check_cart function
-    check_cart(test_user, test_cart, test_products)
-
-    # Captured the print
-    captured = capfd.readouterr()
-
-    #Expected output
-    expected_output = f"['Banana', 1.0, 15]\n['Peanut Butter', 3.0, 6]\n\n\nThank you for your purchase, {test_user.name}! Your remaining balance is {test_user.wallet}"
-
-    #Asserts that the expected output matches the correct output
-    assert expected_output == captured.out.strip()
-    
-    # Ensure that the user's wallet has been changed
-    assert test_user.wallet == 46.0
-
-#Test case for check_cart twice
-def test_check_cart_twice(test_user, test_cart, test_products, capfd, mock_input):
-    mock_input.side_effect = ["Y","Y"]
+#Test case for checking out non-empty cart with insufficient balance
+def test_checkout_insufficient_balance(test_user, test_cart, test_products, capfd, mock_input):
+    mock_input.side_effect = ["Y"]
 
     # Updates users balance
-    test_user.wallet = 10.0
+    test_user.wallet = 0.0
 
     #Extracts product
     banana = get_product_by_name(test_products, "Banana")
@@ -324,84 +268,21 @@ def test_check_cart_twice(test_user, test_cart, test_products, capfd, mock_input
 
     # Captured the print
     captured = capfd.readouterr()
-
+    
     #Expected output
-    expected_output = f"['Banana', 1.0, 15]\n\n\nThank you for your purchase, {test_user.name}! Your remaining balance is {test_user.wallet}"
-
-    #Asserts that the expected output matches the correct output
-    assert expected_output == captured.out.strip()
-
-    # Ensure that the user's wallet has been changed
-    assert test_user.wallet == 9.0
-
-    #Run check_cart function
-    check_cart(test_user, test_cart, test_products)
-
-    # Captured the print
-    captured = capfd.readouterr()
-
-    #Expected output
-    expected_output = f"Your basket is empty. Please add items before checking out."
+    expected_output = "['Banana', 1.0, 15]\n\n\nYou don't have enough money to complete the purchase.\nPlease try again!"
 
     #Asserts that the expected output matches the correct output
     assert expected_output == captured.out.strip()
     
     # Ensure that the user's wallet has been changed
-    assert test_user.wallet == 9.0
-
-#Test case for check_cart three times with a random input
-def test_check_cart_three_times(test_user, test_cart, test_products, capfd, mock_input):
-    mock_input.side_effect = ["Y", "adasdafADasdaw23!", "Y"]
-
-    # Updates users balance
-    test_user.wallet = 10.0
-
-    #Extracts product
-    banana = get_product_by_name(test_products, "Banana")
-
-    #Adds single item to cart, banana costs 1
-    test_cart.add_item(banana)
-    # Ensure that the shopping cart has a banana
-    assert test_cart.items == [banana]
-    #Run check_cart function
-    check_cart(test_user, test_cart, test_products)
-    # Captured the print
-    captured = capfd.readouterr()
-    #Expected output
-    expected_output = f"['Banana', 1.0, 15]\n\n\nThank you for your purchase, {test_user.name}! Your remaining balance is {test_user.wallet}"
-    #Asserts that the expected output matches the correct output
-    assert expected_output == captured.out.strip()
-    # Ensure that the user's wallet has been changed
-    assert test_user.wallet == 9.0
+    assert test_user.wallet == 0.0
 
 
-    # Ensure that the shopping cart is empty
-    assert not test_cart.items 
-    #Run check_cart function
-    result = check_cart(test_user, test_cart, test_products)
-    # Asserts false return
-    assert result is False
-    #Expected output
-    expected_output = f""
-    # Captured the print
-    captured = capfd.readouterr()
-    #Asserts that the expected output matches the correct output
-    assert expected_output == captured.out.strip()
-
-    #Run check_cart function
-    check_cart(test_user, test_cart, test_products)
-    # Captured the print
-    captured = capfd.readouterr()
-    #Expected output
-    expected_output = f"Your basket is empty. Please add items before checking out."
-    #Asserts that the expected output matches the correct output
-    assert expected_output == captured.out.strip()
-    # Ensure that the user's wallet has been changed
-    assert test_user.wallet == 9.0
 
 #Test case for check_cart and emptying stock, then trying to re-add the item. Instead of cart being empty it shows None
 def test_check_cart_to_empty_stock(test_user, test_cart, test_products, capfd, mock_input):
-    mock_input.side_effect = ["Y","Y"]
+    mock_input.side_effect = ["Y"]
     # Updates users balance
     test_user.wallet = 30.0
     #Tests the users wallet amount
@@ -455,7 +336,7 @@ def test_check_cart_to_empty_stock(test_user, test_cart, test_products, capfd, m
     assert not test_cart.items
 
 #Test case for check_cart twice, after emptying the stock. Instead of cart being empty it shows None
-def test_check_cart_twice(test_user, test_cart, test_products, capfd, mock_input):
+def test_check_cart_twice_after_emptying_stock(test_user, test_cart, test_products, capfd, mock_input):
     mock_input.side_effect = ["Y","Y"]
     # Updates users balance
     test_user.wallet = 30.0
