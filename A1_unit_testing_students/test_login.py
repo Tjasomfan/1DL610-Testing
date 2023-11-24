@@ -64,9 +64,9 @@ def test_login_new_dont_create(mock_input, mock_open):
     # Assert that a new user was not created
     assert result is None
 #Login as new user and create a new, with a password that is acceptable
-def test_login_new_dont_create(mock_input, mock_open):
+def test_login_new_create(mock_input, mock_open):
     # Set the expected user input
-    mock_input.side_effect = ["NewUser", "new", "Yes", "CoolGuys123!"]
+    mock_input.side_effect = ["NewUser", "new", "Yes", "CorrectPassword!"]
 
     result = login()
 
