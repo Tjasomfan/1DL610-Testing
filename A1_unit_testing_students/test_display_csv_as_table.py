@@ -138,3 +138,43 @@ class TestDisplayCSVAsTable(unittest.TestCase):
                 assert False
             except:
                 assert True
+
+    def test_int_input(self):
+        csv_content = ''
+        # Create a temporary CSV file
+        temp_file = create_temporary_file(csv_content, '.csv')
+        result = None
+        
+        try:
+            result = display_csv_as_table(15)
+            assert False
+        except:
+            assert True
+            self.assertIsNone(result)
+
+    def test_float_input(self):
+        csv_content = ''
+        # Create a temporary CSV file
+        temp_file = create_temporary_file(csv_content, '.csv')
+        result = None
+        
+        try:
+            result = display_csv_as_table(5003.5)
+            assert False
+        except:
+            assert True
+            self.assertIsNone(result)
+
+    def test_list_input(self):
+        csv_content = ''
+        # Create a temporary CSV file
+        temp_file = create_temporary_file(csv_content, '.csv')
+        result = None
+        
+        try:
+            result = display_csv_as_table([temp_file.name, "hello.csv", "products.csv", "login.py"])
+            assert False
+        except:
+            assert True
+            self.assertIsNone(result)
+
