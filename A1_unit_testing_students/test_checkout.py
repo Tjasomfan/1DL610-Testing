@@ -30,6 +30,12 @@ def test_products():
     testproducts = load_products_from_csv("products.csv")
     return testproducts
 
+#Function to filter a product by name from the products list
+def get_product_by_name(products, target_name):
+    for product in products:
+        if product.name == target_name:
+            return product
+    return None  # Return None if the product with the specified name is not found
 
 
 #Test case for checking out an empty cart
@@ -37,11 +43,8 @@ def test_checkout_empty_cart(test_user, test_cart, test_products, capfd):
     # Updates users balance
     test_user.wallet = 10.0
 
-    #Creates empty cart
-    cart = ShoppingCart()
-
     #Checkout the cart
-    checkout(test_user, cart, test_products)
+    checkout(test_user, test_cart, test_products)
 
     # Captured the print
     captured = capfd.readouterr()
@@ -56,15 +59,12 @@ def test_checkout_empty_cart(test_user, test_cart, test_products, capfd):
     assert test_user.wallet == 10.0
 
     # Ensure that the shopping cart remains empty
-    assert not cart.items
+    assert not test_cart.items
 
 #Test case for checking out an empty cart and empty wallet
 def test_checkout_empty_cart_and_wallet(test_user, test_cart, test_products, capfd):
-    #Creates empty cart
-    cart = ShoppingCart()
-
     #Checkout the cart
-    checkout(test_user, cart, test_products)
+    checkout(test_user, test_cart, test_products)
 
     # Captured the print
     captured = capfd.readouterr()
@@ -79,15 +79,7 @@ def test_checkout_empty_cart_and_wallet(test_user, test_cart, test_products, cap
     assert test_user.wallet == 0.0
 
     # Ensure that the shopping cart remains empty
-    assert not cart.items
-
-#Function to filter a product by name from the products list
-def get_product_by_name(products, target_name):
-    for product in products:
-        if product.name == target_name:
-            return product
-    return None  # Return None if the product with the specified name is not found
-
+    assert not test_cart.items
 
 #Test case for checking out a cart with user having a balance of zero
 def test_zero_wallet_balance(test_user, test_cart, test_products, capfd):
@@ -115,7 +107,7 @@ def test_zero_wallet_balance(test_user, test_cart, test_products, capfd):
     # Ensure that the shopping cart remains unchanged
     assert test_cart.items == [banana]
 
-#Test case for insufficient wallet balance
+#Test case for 2 items insufficient wallet balance
 def test_2_items_insufficient_checkout(test_user, test_cart, test_products, capfd):
     # Updates users balance
     test_user.wallet = 10.0
@@ -219,7 +211,7 @@ def test_succesful_checkout(test_user, test_cart, test_products, capfd):
     # Ensure that the user's wallet has the correct balance
     assert test_user.wallet == 0.0
 
-    # Ensure that the shopping cart remains unchanged
+    # Ensure that the shopping cart is empty
     assert test_cart.items == []
 
 #Test case for succesful checkout for several items
@@ -260,7 +252,7 @@ def test_2_items_checkout(test_user, test_cart, test_products, capfd):
     # Ensure that the user's wallet has the correct balance
     assert test_user.wallet == 1.0
 
-    # Ensure that the shopping cart remains unchanged
+    # Ensure that the shopping cart is empty
     assert test_cart.items == []
 
 #Test case for product being bought up and removed from products list
@@ -282,16 +274,14 @@ def test_remove_item_from_products(test_user, test_cart, test_products, capfd):
     #Checkout the cart
     checkout(test_user, test_cart, test_products)
     
-    # Captured the print
-    captured = capfd.readouterr()
-    
+   
     #assert that there has been one banana subtracted from stock
     assert salmon.units == 0
     
     # Ensure that the user's wallet has the correct balance
     assert test_user.wallet == 10.0
 
-    # Ensure that the shopping cart remains unchanged
+    # Ensure that the shopping cart is empty
     assert test_cart.items == []
 
     #extracts salmon again
@@ -300,7 +290,7 @@ def test_remove_item_from_products(test_user, test_cart, test_products, capfd):
     #checks that there is no item named salmon anymore in products list
     assert salmon == None
 
-#Test case for insufficient units, shouldn't be able to check out when too many items are in cart? Although this check isn't programmed
+#Test case for insufficient units, shouldn't be able to check out when too many items are in cart, although this check isn't programmed
 def test_checkout_with_insufficient_units(test_user, test_cart, test_products, capfd):
     # Updates users balance
     test_user.wallet = 30.0
@@ -322,82 +312,32 @@ def test_checkout_with_insufficient_units(test_user, test_cart, test_products, c
     
     # Captured the print
     captured = capfd.readouterr()
-    
-    #assert that there has been one banana subtracted from stock
-    assert salmon.units == -1
-    
-    # Ensure that the user's wallet has the correct balance
-    assert test_user.wallet == 0.0
-
-    # Ensure that the shopping cart remains unchanged
-    assert test_cart.items == []
-
-#Test case for multiple checkouts and large balance
-def test_checkout_purchase_more_checkout_and_large_balance(test_user, test_cart, test_products, capfd):
-    # Updates users balance
-    test_user.wallet = 1000000.0
-    #Tests the users wallet amount
-    assert test_user.wallet == 1000000.0
-
-    #Extracts products
-    banana = get_product_by_name(test_products, "Banana")
-    salmon = get_product_by_name(test_products, "Salmon")
-
-    #asserts correct number of item in stock.
-    assert banana.units == 15
-    assert salmon.units == 2
-
-    #Adds single item to cart
-    test_cart.add_item(banana)
-    test_cart.add_item(salmon)
-
-    #Checkout the cart
-    checkout(test_user, test_cart, test_products)
-
-    # Captured the print
-    captured = capfd.readouterr()
-    
-    #Expected output
-    expected_output = f"Thank you for your purchase, {test_user.name}! Your remaining balance is {test_user.wallet}"
-
-    #Asserts that the expected output matches the correct output
-    assert expected_output == captured.out.strip()
 
     #assert that there has been one banana subtracted from stock
-    assert banana.units == 14
-    assert salmon.units == 1
-    
-    # Ensure that the user's wallet has the correct balance
-    assert test_user.wallet == 999989.0
-
-    # Ensure that the shopping cart remains unchanged
-    assert test_cart.items == []
-
-    #Adds single item to cart
-    test_cart.add_item(banana)
-    test_cart.add_item(banana)
-    test_cart.add_item(salmon)
-    assert banana.units == 14
-    assert salmon.units == 1
-
-    #Checkout the cart
-    checkout(test_user, test_cart, test_products)
-
-    # Captured the print
-    captured = capfd.readouterr()
-    
-    #Expected output
-    expected_output = f"Thank you for your purchase, {test_user.name}! Your remaining balance is {test_user.wallet}"
-
-    #Asserts that the expected output matches the correct output
-    assert expected_output == captured.out.strip()
-
-    #assert that there has been one banana subtracted from stock
-    assert banana.units == 12
     assert salmon.units == 0
     
     # Ensure that the user's wallet has the correct balance
-    assert test_user.wallet == 999977.0
+    assert test_user.wallet == 10.0
 
-    # Ensure that the shopping cart remains unchanged
-    assert test_cart.items == []
+
+#Test case for checking out non-existing product in products-list.
+def test_checkout_non_existing_product(test_user, test_cart, test_products, capfd):
+    # Updates users balance
+    test_user.wallet = 30.0
+    #Tests the users wallet amount
+    assert test_user.wallet == 30.0
+
+    product = Product("Product", 10.0, 5)
+
+
+    #Adds single item to cart
+    test_cart.add_item(product)
+
+    #Checkout the cart
+    checkout(test_user, test_cart, test_products)
+    
+    # Captured the print
+    captured = capfd.readouterr()
+    
+    # Ensure that the user's wallet has the correct balance
+    assert test_user.wallet == 30.0

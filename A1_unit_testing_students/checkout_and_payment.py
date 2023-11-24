@@ -86,14 +86,14 @@ def checkout(user, cart, products):
     print(f"Thank you for your purchase, {user.name}! Your remaining balance is {user.wallet}")
     
 # Function to check the cart and proceed to checkout if requested
-def check_cart(user, cart):
+def check_cart(user, cart, test_products):
     # Print products in the cart
     for i in cart.retrieve_item():
         print(i.get_product())
     # Ask the user if they want to checkout
     question = input("Do you want to checkout (Y/N)?")
     if question.lower()  == "y":
-        return checkout(user,cart)
+        return checkout(user, cart, test_products)
     else:
         return False
 
