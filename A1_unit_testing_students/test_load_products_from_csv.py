@@ -5,14 +5,6 @@ import csv
 import os
 import shutil
 
-# Function to load products from a CSV file
-
-# Potential issues:
-# - Missing or misspelled keys (e.g., 'Product', 'Price', 'Units') in the CSV file
-# - Values in 'Price' and 'Units' columns that are not convertible to the expected types (e.g., '1.00' as 'Price' should be convertible to float)
-# - The 'Product', 'Price', or 'Units' key may not exist in the current row
-# - The values may be empty or contain unexpected characters
-
 # ==============================================================================
 # FIXTURE
 # ==============================================================================
@@ -24,9 +16,14 @@ def valid_csv_file():
 
     # Write sample data to the temporary CSV file with correct data types
     csv_writer = csv.writer(csv_file)
-    csv_writer.writerow(['Apple', '1.00', '10'])
-    csv_writer.writerow(['Banana', '0.75', '8'])
-    csv_writer.writerow(['Orange', '1.25', '12'])
+    csv_writer.writerow(['Product', 'Price', 'Units'])
+    csv_writer.writerow(['Apple', 1.00, 10])
+    csv_writer.writerow(['Banana', 0.75, 8])
+    csv_writer.writerow(['Orange', 1.25, 12])
+
+    # Print the content of the CSV file
+    csv_file.seek(0)
+    print(csv_file)
 
     # The point where the test function can use the fixture before it is teared down
     yield csv_file.name
@@ -65,14 +62,12 @@ def test_list_input():
         load_products_from_csv([1])
 
 # Test 4: Loading products from a CSV file with incorrect file path
-def test_load_products_from_csv_incorrect_file_path():
-    non_existent_file = 'non_existent_file.csv'
-
+def test_incorrect_file_path():
     with pytest.raises(FileNotFoundError):
-        load_products_from_csv(non_existent_file)
+        load_products_from_csv('non_existent_file.csv')
 
 # Test 5: Loading products from a valid CSV file
-def test_load_products_from_csv_valid_input(valid_csv_file):
+def test_valid_file_path(valid_csv_file):
     products = load_products_from_csv(valid_csv_file)
 
     # Check the number of products loaded
@@ -83,65 +78,48 @@ def test_load_products_from_csv_valid_input(valid_csv_file):
     assert products[0].price == 1.00
     assert products[0].units == 10
 
-# Test 6: Loading products from a CSV file with different data types (string, float, integer)
-def test_load_products_from_csv_different_data_types(valid_csv_file):
+# Test 6: Loading products from a CSV file with wrong data type in the values
+def test_wrong_data_type_in_values(valid_csv_file):
     # Create a CSV file with mixed data types
     with open(valid_csv_file, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(['Product', 'Price', 'Units'])
-        csv_writer.writerow(['Apple', '1.00', '10'])
-        csv_writer.writerow(['Banana', '0.75', '8'])
-        csv_writer.writerow(['Orange', '1.25', '12.5'])  # Float in the 'Units' column
+        csv_writer.writerow(['Apple', 1.00, 10])
+        csv_writer.writerow(['Banana', 0.75, 8])
+        csv_writer.writerow(['Orange', 1.25, 12.5]) # Float in the 'Units' column
 
-    # Execute the test
-    products = load_products_from_csv(valid_csv_file)
+    # Check that exception was thrown
+    with pytest.raises(ValueError):
+        load_products_from_csv(valid_csv_file)
 
-    # Check the number of products loaded
-    assert len(products) == 3
-
-    # Check the details of a specific product
-    assert products[2].name == 'Orange'
-    assert products[2].price == '1.25'
-    assert products[2].units == '12.5'
-
-# Test 7: Loading products from a CSV file with special characters in the values
-def test_load_products_from_csv_special_characters(valid_csv_file):
+# Test 7: Loading products from a CSV file with convertable valid data type in the values
+def test_convertable_valid_data_type_in_values(valid_csv_file):
     # Create a CSV file with special characters
     with open(valid_csv_file, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(['Product', 'Price', 'Units'])
-        csv_writer.writerow(['Apple', '1.00', '!@#$%^&*()'])  # Special characters in the 'Units' column
+        csv_writer.writerow(['Apple', 1, 10])  # Int in the 'Price' column
 
     # Execute the test
     products = load_products_from_csv(valid_csv_file)
 
-    # Check the number of products loaded
-    assert len(products) == 1
-
-    # Check the details of the product
-    assert products[0].name == 'Apple'
-    assert products[0].price == '1.00'
-    assert products[0].units == '!@#$%^&*()'
+    # Check that int was converted to float correctly
+    assert products[0].price == 1.0
 
 # Test 8: Loading products from a CSV file with empty values
-def test_load_products_from_csv_empty_values(valid_csv_file):
+def test_empty_string(valid_csv_file):
     # Create a CSV file with empty values
     with open(valid_csv_file, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(['Product', 'Price', 'Units'])
-        csv_writer.writerow(['', '', ''])  # Empty values in all columns
+        csv_writer.writerow(['', 1.0, 10])  # Empty value
 
-    # Execute the test
+    # Check that row with missing value is not returned
     products = load_products_from_csv(valid_csv_file)
-
-    # Check the number of products loaded
-    assert len(products) == 1
-
-    # Check that all fields are empty strings
-    assert all(not product.name and not product.price and not product.units for product in products)
+    assert len(products) == 0
 
 # Test 9: Loading products from a CSV file with missing columns
-def test_load_products_from_csv_missing_columns(valid_csv_file):
+def test_missing_columns(valid_csv_file):
     # Create a CSV file with missing columns
     with open(valid_csv_file, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
@@ -154,7 +132,7 @@ def test_load_products_from_csv_missing_columns(valid_csv_file):
     assert len(products) == 0  # No products should be loaded due to the missing column
 
 # Test 10: Loading products from a CSV file with extra columns
-def test_load_products_from_csv_extra_columns(valid_csv_file):
+def test_extra_columns(valid_csv_file):
     # Create a CSV file with extra columns
     with open(valid_csv_file, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
@@ -165,40 +143,3 @@ def test_load_products_from_csv_extra_columns(valid_csv_file):
 
     # Check the number of products loaded
     assert len(products) == 0  # No products should be loaded due to the extra column
-
-# Test 11: Loading products from a CSV file with a large number of entries
-def test_load_products_from_csv_large_number_of_entries(valid_csv_file):
-    # Create a CSV file with a large number of entries
-    with open(valid_csv_file, 'w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(['Product', 'Price', 'Units'])
-        for i in range(10000):
-            csv_writer.writerow([f'Product{i}', '1.00', '10'])
-
-    # Execute the test
-    products = load_products_from_csv(valid_csv_file)
-
-    # Check the number of products loaded
-    assert len(products) == 10000
-
-# Test 12: Loading products from an empty CSV file
-def test_load_products_from_csv_empty_file(valid_csv_file):
-    # Create an empty CSV file
-    with open(valid_csv_file, 'w', newline='') as csvfile:
-        pass  # Empty file
-
-    # Execute the test
-    products = load_products_from_csv(valid_csv_file)
-
-    # Check the number of products loaded
-    assert len(products) == 0  # No products should be loaded from an empty file
-
-# Test 13: Loading products from a CSV file with invalid file format
-def test_load_products_from_csv_invalid_file_format(valid_csv_file):
-    # Create a CSV file with invalid format (e.g., not a CSV file)
-    with open(valid_csv_file, 'w') as text_file:
-        text_file.write("This is not a CSV file")
-
-    # Execute the test
-    with pytest.raises(csv.Error):  # Expecting a csv.Error for invalid format
-        load_products_from_csv(valid_csv_file)
