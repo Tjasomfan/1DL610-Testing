@@ -1,37 +1,6 @@
 import pytest
 from unittest.mock import patch
-import tempfile
-from io import StringIO
 from products import searchAndBuyProduct
-import shutil
-
-
-# Fixture to create a temporary directory for the test
-@pytest.fixture
-def temp_dir(tmp_path):
-    return tmp_path / "temp_test_dir"
-
-# Fixture to provide the path to the original users.json file
-@pytest.fixture
-def original_products_csv():
-    # Adjust the path accordingly based on the actual location of your original users.json file
-    original_file_path = "products.csv"
-    return original_file_path
-
-# Fixture to provide the path to the copied users.json file in the temporary directory
-@pytest.fixture
-def copied_products_csv(temp_dir, original_products_csv):
-    # Create the temporary directory and copy the original file to it
-    temp_dir.mkdir()
-    copied_file_path = temp_dir / "copied_products.csv"
-    shutil.copy(original_products_csv, copied_file_path)
-    return copied_file_path
-
-# Fixture to mock the open function to use the copied users.json file
-@pytest.fixture
-def mock_open(copied_products_csv, mocker):
-    return mocker.patch('builtins.open', mocker.mock_open(read_data=open(copied_products_csv).read()))
-
 
 # Fixture to mock the input function
 @pytest.fixture
@@ -46,25 +15,71 @@ def login_stub(mocker):
 def checkoutAndPayment_stub(mocker):
     return mocker.patch('products.checkoutAndPayment')
 
+@pytest.fixture
+def display_csv_as_table_stub(mocker):
+    return mocker.patch('products.display_csv_as_table')
+
+@pytest.fixture
+def display_filtered_table_stub(mocker):
+    return mocker.patch('products.display_filtered_table')
+
 # Test searching for all
-def test_all(mock_input, login_stub, checkoutAndPayment_stub, mock_open):
+def test_all(mock_input, login_stub, checkoutAndPayment_stub, display_csv_as_table_stub, display_filtered_table_stub):
     mock_input.side_effect = ["all", "y"]
     res = searchAndBuyProduct()
 
-# Test searching for value in no rows
+    display_csv_as_table_stub.assert_called_once_with("products.csv")
+    assert display_filtered_table_stub.call_count == 0
 
-# Test searching for value in one row
+# Test searching for all
+def test_all_upper(mock_input, login_stub, checkoutAndPayment_stub, display_csv_as_table_stub, display_filtered_table_stub):
+    mock_input.side_effect = ["ALL", "y"]
+    res = searchAndBuyProduct()
 
-# Test searching for value in two rows
+    display_csv_as_table_stub.assert_called_once_with("products.csv")
+    assert display_filtered_table_stub.call_count == 0
 
-# Test saying Y right away
+# Test searching for apple
+def test_apple(mock_input, login_stub, checkoutAndPayment_stub, display_csv_as_table_stub, display_filtered_table_stub):
+    mock_input.side_effect = ["apple", "y"]
+    res = searchAndBuyProduct()
 
-# Test saying N then Y
+    display_filtered_table_stub.assert_called_once_with("products.csv", "apple")
+    assert display_csv_as_table_stub.call_count == 0
 
-# Test saying something other than y/n
+# Test searching for orange and apple
+def test_orange_and_apple(mock_input, login_stub, checkoutAndPayment_stub, display_csv_as_table_stub, display_filtered_table_stub):
+    mock_input.side_effect = ["orange", "n", "apple", "y"]
+    res = searchAndBuyProduct()
 
-# Test that login() is called
+    assert display_filtered_table_stub.call_count == 2
+    assert display_csv_as_table_stub.call_count == 0
 
-# Test that checkoutAndPayment is called
+# Test searching for orange and apple
+def test_login_called(mock_input, login_stub, checkoutAndPayment_stub, display_csv_as_table_stub, display_filtered_table_stub):
+    mock_input.side_effect = ["orange", "n", "apple", "y"]
+    res = searchAndBuyProduct()
 
-# Test that test times out if login always fails
+    assert login_stub.call_count == 1
+    
+# Test searching for orange and apple
+def test_checkout_called(mock_input, login_stub, checkoutAndPayment_stub, display_csv_as_table_stub, display_filtered_table_stub):
+    mock_input.side_effect = ["orange", "n", "apple", "y"]
+    res = searchAndBuyProduct()
+
+    assert checkoutAndPayment_stub.call_count == 1
+
+# Test answer hello instead of y/n
+def test_hello(mock_input, login_stub, checkoutAndPayment_stub, display_csv_as_table_stub, display_filtered_table_stub):
+    mock_input.side_effect = ["orange", "hello", "apple", "y"]
+    res = searchAndBuyProduct()
+
+    assert display_filtered_table_stub.call_count == 2
+
+# Test searching for orange and all
+def test_orange_and_all(mock_input, login_stub, checkoutAndPayment_stub, display_csv_as_table_stub, display_filtered_table_stub):
+    mock_input.side_effect = ["orange", "N", "all", "y"]
+    res = searchAndBuyProduct()
+
+    assert display_filtered_table_stub.call_count == 1
+    assert display_csv_as_table_stub.call_count == 1
