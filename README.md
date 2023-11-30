@@ -1,4 +1,4 @@
-# 1DL610-HT23-coding-assignments-students
+# 1DL610 - GROUP 14
 For students to download code from
 
 Instructions for Lab 1:
