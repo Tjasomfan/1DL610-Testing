@@ -432,11 +432,79 @@ def test_checkout_non_existing_product(test_user, test_cart, test_products, capf
     
     # Ensure that the user's wallet has the correct balance
     assert test_user.wallet == 30.0
-# New tests for card payment
-#Not enough funds on card
-#Sufficient funds on card
-#No cards registered
 
+
+# New tests for card payment
+    
+@pytest.fixture
+def test_cards():
+    return [{"name" : "Debit", "balance":1000}, {"name" : "Credit", "balance":100}, {"name" : "Debit", "balance":0}]
+
+#Not enough funds on card
+def test_card_empty(test_user, test_cart, test_products, test_cards, mock_input):
+    mock_input.side_effect = ["c","3"]
+
+    #Extracts product
+    banana = get_product_by_name(test_products, "Banana")
+
+    #asserts correct number of item in stock.
+    assert banana.units == 15
+
+    #Adds single item to cart, banana costs 1
+    test_cart.add_item(banana)
+
+    #Checkout the cart
+    checkout(test_user, test_cart, test_products, test_cards)
+    
+    assert test_cards[0]["balance"] == 1000
+    assert test_cards[1]["balance"] == 100
+    assert test_cards[2]["balance"] == 0
+
+
+
+#Sufficient funds on card
+def test_card_not_empty(test_user, test_cart, test_products, test_cards, mock_input):
+    mock_input.side_effect = ["c","2"]
+
+    #Extracts product
+    banana = get_product_by_name(test_products, "Banana")
+
+    #asserts correct number of item in stock.
+    assert banana.units == 15
+
+    #Adds single item to cart, banana costs 1
+    test_cart.add_item(banana)
+
+    #Checkout the cart
+    checkout(test_user, test_cart, test_products, test_cards)
+    
+    assert test_cards[0]["balance"] == 1000
+    assert test_cards[1]["balance"] == 99
+    assert test_cards[2]["balance"] == 0
+
+#No cards registered
+def test_no_cards(test_user, test_cart, test_products, mock_input):
+    mock_input.side_effect = ["c","2"]
+
+    # Updates users balance
+    test_user.wallet = 30.0
+    #Tests the users wallet amount
+    assert test_user.wallet == 30.0
+
+    #Extracts product
+    banana = get_product_by_name(test_products, "Banana")
+
+    #asserts correct number of item in stock.
+    assert banana.units == 15
+
+    #Adds single item to cart, banana costs 1
+    test_cart.add_item(banana)
+
+    #Checkout the cart
+    checkout(test_user, test_cart, test_products, [])
+    
+    assert test_user.wallet == 29.0
+    
 
 
 # TEST LOAD_PRODUCTS_FROM_CSV tests: 6, 7, 8, 9, 10
