@@ -58,21 +58,49 @@ def load_products_from_csv(file_path):
 cart = ShoppingCart()
 
 # Function to complete the checkout process
-def checkout(user, cart, products):
+def checkout(user, cart, products , cards = []):
     if not cart.items:
         print("\nYour basket is empty. Please add items before checking out.")
         return
 
     total_price = cart.get_total_price()
+    # Implementation for cards
+    choice = input("\nDo you want to use your wallet or one of your cards? (w for wallet, c for cards): ")
+    if choice == "c":
+        if len(cards) < 1:
+            print("\n")
+            print(f"You don't have any cards.")
+            print("Please try again!")
+            return 
+        else:
+            for i, card in enumerate(cards):
+                print(f"{i+1}. {card.name}")
+            card_choice = int(input("\nWhich card do you want to use?: ")) - 1
+            if card_choice >= len(cards) or card_choice < 0:
+                print("\n")
+                print(f"There is no such card.")
+                print("Please try again!")
+                return
+            card = cards[card_choice]
+            if total_price > card.balance:
+                print("\n")
+                print(f"That card does not have enough money to complete the purchase.")
+                print("Please try again!")
+                return
 
-    if total_price > user.wallet:
-        print("\n")
-        print(f"You don't have enough money to complete the purchase.")
-        print("Please try again!")
-        return
+            # Deduct the total price from the user's wallet
+            card.balance -= total_price
+    else:
+        if total_price > user.wallet:
+            print("\n")
+            print(f"You don't have enough money to complete the purchase.")
+            print("Please try again!")
+            return
 
-    # Deduct the total price from the user's wallet
-    user.wallet -= total_price
+        # Deduct the total price from the user's wallet
+        user.wallet -= total_price
+
+
     # Update product units and remove products with zero units
     for item in cart.items:
         item.units -= 1

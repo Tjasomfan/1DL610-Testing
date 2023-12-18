@@ -432,6 +432,11 @@ def test_checkout_non_existing_product(test_user, test_cart, test_products, capf
     
     # Ensure that the user's wallet has the correct balance
     assert test_user.wallet == 30.0
+# New tests for card payment
+#Not enough funds on card
+#Sufficient funds on card
+#No cards registered
+
 
 
 # TEST LOAD_PRODUCTS_FROM_CSV tests: 6, 7, 8, 9, 10
@@ -873,3 +878,4 @@ def test_length_without_logout(mock_input):
     assert (not result)
     assert(len(cart.items) == 1)
     
+
