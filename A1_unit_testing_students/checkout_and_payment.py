@@ -65,37 +65,32 @@ def checkout(user, cart, products , cards = []):
 
     total_price = cart.get_total_price()
     # Implementation for cards
-    choice = input("\nDo you want to use your wallet or one of your cards? (w for wallet, c for cards): ")
-    if choice == "c":
-        if len(cards) < 1:
+    #choice = input("\nDo you want to use your wallet or one of your cards? (w for wallet, c for cards): ")
+    if len(cards) > 0 and input("\nDo you want to use your wallet or one of your cards? (w for wallet, c for cards): ") == "c":
+        for i, card in enumerate(cards):
+            card_name = card["name"]
+            print(f"{i+1}. {card_name}")
+        card_choice = int(input("\nWhich card do you want to use?: ")) - 1
+        if card_choice >= len(cards) or card_choice < 0:
             print("\n")
-            print(f"You don't have any cards.")
+            print(f"There is no such card.")
             print("Please try again!")
-            return 
-        else:
-            for i, card in enumerate(cards):
-                print(f"{i+1}. {card.name}")
-            card_choice = int(input("\nWhich card do you want to use?: ")) - 1
-            if card_choice >= len(cards) or card_choice < 0:
-                print("\n")
-                print(f"There is no such card.")
-                print("Please try again!")
-                return
-            card = cards[card_choice]
-            if total_price > card.balance:
-                print("\n")
-                print(f"That card does not have enough money to complete the purchase.")
-                print("Please try again!")
-                return
+            return
+        card = cards[card_choice]
+        if total_price > card["balance"]:
+            print("\n")
+            print(f"That card does not have enough money to complete the purchase.")
+            print("Please try again!")
+            return
 
-            # Deduct the total price from the user's wallet
-            card.balance -= total_price
+        # Deduct the total price from the user's wallet
+        card["balance"] -= total_price
     else:
         if total_price > user.wallet:
             print("\n")
             print(f"You don't have enough money to complete the purchase.")
             print("Please try again!")
-            return
+            return 
 
         # Deduct the total price from the user's wallet
         user.wallet -= total_price
