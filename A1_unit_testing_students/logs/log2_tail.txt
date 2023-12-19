@@ -1,0 +1,10 @@
+=========================== short test summary info ===========================
+FAILED regression_3.py::test_check_cart_to_empty_stock - assert not [None]
+FAILED regression_3.py::test_check_cart_twice_after_emptying_stock - Failed: ...
+FAILED regression_3.py::test_checkout_with_insufficient_units - assert -1 == 0
+FAILED regression_3.py::test_checkout_non_existing_product - assert 20.0 == 30.0
+FAILED regression_3.py::test_int_input - Failed: DID NOT RAISE <class 'TypeEr...
+FAILED regression_3.py::test_successful_search_all_rows_2 - assert "['Product...
+FAILED regression_3.py::test_login_new_long_password - StopIteration
+FAILED regression_3.py::test_login_new_just_enough_password - StopIteration
+=================== 8 failed, 34 passed, 1 warning in 0.46s ===================
