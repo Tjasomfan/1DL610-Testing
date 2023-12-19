@@ -668,6 +668,45 @@ def test_login_new_no_uppercase(mock_input, mock_open):
     assert result == None
 
 
+## TEST edit_user
+from edit_user import edit_user
+
+# Test case for 0 cards
+def test_edit_user_no_cards(mock_input, mock_open): 
+    # Set the expected user input
+    mock_input.side_effect = ["5th street", "555", "ram@gmail.com",  "n"]
+
+    # Call the function
+    result = edit_user({"username" : "Ramanathan", "password": "Notaproblem23*", "wallet" : 100})
+
+    # Assert that the login was successful and returned the expected user data
+    assert result == {"username": "Ramanathan", "password": "Notaproblem23*", "wallet": 100, "address": "5th street", "phone": "555", "email": "ram@gmail.com", "cards": []}
+
+# Test case for 1 cards
+def test_edit_user_one_cards(mock_input, mock_open): 
+    # Set the expected user input
+    mock_input.side_effect = ["5th street", "555", "ram@gmail.com",  "y", "123", "5/3/1", "nam","979797", "n" ]
+
+    # Call the function
+    result = edit_user({"username" : "Ramanathan", "password": "Notaproblem23*", "wallet" : 100})
+
+    # Assert that the login was successful and returned the expected user data
+    assert result == {"username": "Ramanathan", "password": "Notaproblem23*", "wallet": 100, "address": "5th street", "phone": "555", "email": "ram@gmail.com",
+                      "cards": [{"number" : "123", "expirationdate" : "5/3/1", "name" : "nam", "ccv" : "979797"}]}
+
+# Test case for 2 cards
+def test_edit_user_two_cards(mock_input, mock_open): 
+    # Set the expected user input
+    mock_input.side_effect = ["5th street", "555", "ram@gmail.com",  "y", "1", "5/5/25", "cardname", "111", "y", "2", "6/1/24", "2nd card", "333", "n"]
+
+    # Call the function
+    result = edit_user({"username" : "Ramanathan", "password": "Notaproblem23*", "wallet" : 100})
+
+    # Assert that the login was successful and returned the expected user data
+    assert result == {"username": "Ramanathan", "password": "Notaproblem23*", "wallet": 100, "address": "5th street", "phone": "555", "email": "ram@gmail.com",
+                      "cards": [{"number" : "1", "expirationdate" : "5/5/25", "name" : "cardname", "ccv" : "111"}, {"number" : "2", "expirationdate" : "6/1/24", "name" : "2nd card", "ccv" : "333"}]}
+
+
 
 ## TEST logout tests: 1,2,8,9,10
 from logout import logout    
