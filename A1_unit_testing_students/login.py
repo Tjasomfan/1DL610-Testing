@@ -1,4 +1,5 @@
 import json
+from edit_user import edit_user
 
 #Login as a user
 def login():
@@ -19,6 +20,7 @@ def login():
             print("Either username or password were incorrect")
             return None
     
+    user = None
     if not data == None:
         with open('users.json', "w") as file:
             if not found_user:
@@ -31,7 +33,10 @@ def login():
                         file.write(json.dumps(data, indent=4))
                         
                         print("New user was created!")
-                        return {"username": username, "wallet": 0}
+                        user = {"username": username, "wallet": 0}
+    if user != None:
+        edit_user(user)
+        return user
     return None
 
 def valid_password(password):
