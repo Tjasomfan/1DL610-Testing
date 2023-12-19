@@ -586,7 +586,7 @@ def test_successful_search_all_rows_2():
     assert captured_output == expected_output
 
 
-## TEST login tests: 1,2,8,9,10
+## TEST login tests: 1,2,6,7,8
 
 from login import login
 
@@ -639,6 +639,24 @@ def test_login_unsuccessful(mock_input, mock_open):
     # Assert that the login was unsuccessful and returned None
     assert result is None
 
+#Login as new user and create a new, with a password with more than 8 characters
+def test_login_new_long_password(mock_input, mock_open):
+    # Set the expected user input
+    mock_input.side_effect = ["NewUser", "new", "Yes", "CoolGuys123!"]
+
+    result = login()
+
+    # Assert that new user was created succesfully
+    assert result == {"username": "NewUser", "wallet": 0}
+#Login as new user and create a new, with a password with 8 characters
+def test_login_new_just_enough_password(mock_input, mock_open):
+    # Set the expected user input
+    mock_input.side_effect = ["NewUser", "new", "Yes", "Cool123!"]
+
+    result = login()
+
+    # Assert that new user was created succesfully
+    assert result == {"username": "NewUser", "wallet": 0}
 #Login as new user and create a new, with a password with special characters but no uppercase characters
 def test_login_new_no_uppercase(mock_input, mock_open):
     # Set the expected user input
@@ -648,24 +666,7 @@ def test_login_new_no_uppercase(mock_input, mock_open):
 
     # Assert that new user was not created because of the incorrect password
     assert result == None
-#Login as new user and create a new, with a password with uppercase characters but no special characters
-def test_login_new_no_special(mock_input, mock_open):
-    # Set the expected user input
-    mock_input.side_effect = ["NewUser", "new", "Yes", "Cool1234"]
 
-    result = login()
-
-    # Assert that new user was not created because of the incorrect password
-    assert result == None
-#Login as new user and create a new, with a password with no uppercase characters or special characters
-def test_login_new_no_uppercase_special(mock_input, mock_open):
-    # Set the expected user input
-    mock_input.side_effect = ["NewUser", "new", "Yes", "cool1234"]
-
-    result = login()
-
-    # Assert that new user was not created because of the incorrect password
-    assert result == None
 
 
 ## TEST logout tests: 1,2,8,9,10
