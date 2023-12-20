@@ -98,7 +98,7 @@ def check_cart(user, cart, test_products):
         return False
 
 # Main function for the shopping and checkout process
-def checkoutAndPayment(login_info):
+def checkoutAndPayment(login_info, products):
     # Create/retrieve a user using login information
     user = User(login_info["username"], login_info["wallet"])
     # Display available products

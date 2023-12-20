@@ -14,14 +14,6 @@ def temp_dir(tmp_path):
     return tmp_path / "temp_test_dir"
 
 @pytest.fixture
-def copy_csv_file():
-    # Set up: Copy the CSV file 
-    shutil.copy('products.csv','copy_products.csv') 
-    yield
-    # Teardown: Remove the copied CSV file 
-    os.remove('copy_products.csv')
-
-@pytest.fixture
 def test_user():
     return User("TestUser", 0.0)
 
@@ -36,10 +28,6 @@ def test_products():
     return testproducts
 
 # Fixture to mock the input function
-@pytest.fixture
-def mock_input(mocker):
-    return mocker.patch('builtins.input')
-
 @pytest.fixture
 def mock_input(mocker):
     return mocker.patch('builtins.input')
@@ -116,17 +104,12 @@ def copied_users_json(temp_dir, original_users_json):
     shutil.copy(original_users_json, copied_file_path)
     return copied_file_path
 
-# Fixture to mock the input function
-@pytest.fixture
-def mock_input(mocker):
-    return mocker.patch('builtins.input')
-
 # Fixture to mock the open function to use the copied users.json file
 @pytest.fixture
 def mock_open(copied_users_json, mocker):
     return mocker.patch('builtins.open', mocker.mock_open(read_data=open(copied_users_json).read()))
 
-## TEST check_cart tests: 1,2,3,4,5
+## TEST check_cart tests: 1, 2, 3, 4, 5
 
 #Test case for not checking out an empty cart
 def test_no_checkout_empty_cart(test_user, test_cart, test_products, mock_input):
@@ -271,7 +254,7 @@ def test_checkout_empty_cart(test_user, test_cart, test_products, capfd, mock_in
 # TEST CHECKOUT tests: 1, 2, 3, 4, 5
 
 #Test case for checking out an empty cart
-def test_checkout_empty_cart(test_user, test_cart, test_products, capfd):
+def test_checkout_empty_cart_checkout(test_user, test_cart, test_products, capfd):
     # Updates users balance
     test_user.wallet = 10.0
 
@@ -451,7 +434,7 @@ def create_temporary_file(content='', _suffix='.csv'):
     temp_file.close()
     return temp_file
 
-def test_empty_csv_file():
+def test_empty_csv_file_table():
     csv_content = ''
     temp_file = create_temporary_file(csv_content, '.csv')
     with pytest.raises(Exception):
