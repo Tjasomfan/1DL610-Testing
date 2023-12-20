@@ -57,6 +57,26 @@ def load_products_from_csv(file_path):
 # products= load_products_from_csv("products.csv")
 cart = ShoppingCart()
 
+#Remove an item from cart function
+def remove_item_from_cart(cart, item, products):
+    if item not in cart.items:
+        print("\nYou don't have this item in your cart.")
+        return
+
+    #Removes item from cart
+    cart.remove_item(item)
+    if item in products:
+        # Put item back in stock
+        item.units += 1
+    else: 
+        products.append(item)
+
+    # Print products in the cart
+    print("Remaining items in cart: ")
+    for i in cart.retrieve_item():
+        print(i.get_product())
+    return
+
 # Function to complete the checkout process
 def checkout(user, cart, products):
     if not cart.items:

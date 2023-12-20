@@ -109,6 +109,16 @@ def copied_users_json(temp_dir, original_users_json):
 def mock_open(copied_users_json, mocker):
     return mocker.patch('builtins.open', mocker.mock_open(read_data=open(copied_users_json).read()))
 
+
+
+## New tests
+
+#Test case for item not existing in cart
+
+#Test case for item correctly removed from cart and added units updated
+
+#Test case for item correctly removed from cart and added to products list
+
 ## TEST check_cart tests: 1, 2, 3, 4, 5
 
 #Test case for not checking out an empty cart
