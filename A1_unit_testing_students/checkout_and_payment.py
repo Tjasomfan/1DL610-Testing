@@ -71,11 +71,15 @@ def remove_item_from_cart(cart, item, products):
     else: 
         products.append(item)
 
-    # Print products in the cart
-    print("Remaining items in cart: ")
-    for i in cart.retrieve_item():
-        print(i.get_product())
-    return
+    if cart.items == []:
+        print("No remaining products in cart.")
+        return
+    else:
+        # Print products in the cart
+        print("Remaining items in cart: ")
+        for i in cart.retrieve_item():
+            print(i.get_product())
+        return
 
 # Function to complete the checkout process
 def checkout(user, cart, products):

@@ -114,10 +114,101 @@ def mock_open(copied_users_json, mocker):
 ## New tests
 
 #Test case for item not existing in cart
+def test_remove_item_not_in_cart(test_cart, capfd, test_products):
+
+    #Extracts product
+    banana = get_product_by_name(test_products, "Banana")
+    salmon = get_product_by_name(test_products, "Salmon")
+
+    #Adds single item to cart
+    test_cart.add_item(banana)
+
+    # Ensure that the shopping cart has a banana
+    assert test_cart.items == [banana]
+
+    #Run remove_item function
+    remove_item_from_cart(test_cart, salmon, test_products)
+
+    # Captured the print
+    captured = capfd.readouterr()
+    
+    #Expected output
+    expected_output = "You don't have this item in your cart."
+
+    #Asserts that the expected output matches the correct output
+    assert expected_output == captured.out.strip()
+
+    # Ensure that the shopping cart has a banana
+    assert test_cart.items == [banana]
+    
 
 #Test case for item correctly removed from cart and added units updated
+def test_remove_item_from_cart_increment(test_cart, capfd, test_products):
+
+    #Extracts products
+    banana = get_product_by_name(test_products, "Banana")
+    salmon = get_product_by_name(test_products, "Salmon")
+
+    #Initial units for Salmon
+    initial_salmon_units = salmon.units
+
+    #Adds items to cart
+    test_cart.add_item(banana)
+    test_cart.add_item(salmon)
+
+    # Ensure that the shopping cart has a banana and a salmon
+    assert test_cart.items == [banana, salmon]
+
+    #Run remove_item function
+    remove_item_from_cart(test_cart, salmon, test_products)
+
+    # Captured the print
+    captured = capfd.readouterr()
+    
+    #Expected output
+    expected_output = "Remaining items in cart: \n['Banana', 1.0, 15]"
+
+    #Updated salmon units
+    salmon = get_product_by_name(test_products, "Salmon")
+    final_salmon_units = salmon.units
+
+    assert final_salmon_units == initial_salmon_units+1
+    #Asserts that the expected output matches the correct output
+    assert expected_output == captured.out.strip()
+    
 
 #Test case for item correctly removed from cart and added to products list
+def test_remove_item_from_cart_added(test_cart, capfd, test_products):
+    #Extracts product
+    product = Product("Product", 10.0, 5)
+
+    #Make sure it's not in products list
+    assert product not in test_products
+
+    #Adds single item to cart
+    test_cart.add_item(product)
+
+    # Ensure that the shopping cart has a product
+    assert test_cart.items == [product]
+
+    #Run remove_item function
+    remove_item_from_cart(test_cart, product, test_products)
+
+    # Ensure that the shopping cart has no product
+    assert test_cart.items == []
+
+    # Captured the print
+    captured = capfd.readouterr()
+    
+    #Expected output
+    expected_output = "No remaining products in cart."
+    
+    #Asserts that the expected output matches the correct output
+    assert expected_output == captured.out.strip()
+
+    #Make sure it's in products list
+    assert product in test_products
+
 
 ## TEST check_cart tests: 1, 2, 3, 4, 5
 
