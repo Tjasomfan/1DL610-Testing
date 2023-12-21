@@ -1,0 +1,87 @@
+Comparing files logfile1.txt and LOGFILE2.TXT
+***** logfile1.txt
+4
+0
+ 
+***** LOGFILE2.TXT
+4
+3
+ 
+*****
+
+***** logfile1.txt
+.
+F
+.
+***** LOGFILE2.TXT
+.
+.
+*****
+
+***** logfile1.txt
+.
+.
+***** LOGFILE2.TXT
+.
+F
+.
+*****
+
+***** logfile1.txt
+.
+ 
+***** LOGFILE2.TXT
+.
+.
+.
+.
+ 
+*****
+
+***** logfile1.txt
+ 
+ 
+ 
+ 
+[
+***** LOGFILE2.TXT
+ 
+[
+*****
+
+***** logfile1.txt
+:
+3
+9
+9
+:
+***** LOGFILE2.TXT
+:
+5
+0
+0
+:
+*****
+
+***** logfile1.txt
+ 
+3
+9
+ 
+***** LOGFILE2.TXT
+ 
+4
+2
+ 
+*****
+
+***** logfile1.txt
+2
+5
+s
+***** LOGFILE2.TXT
+2
+9
+s
+*****
+
